@@ -1,0 +1,196 @@
+import { VerticalBox, HorizontalBox } from "std-widgets.slint";
+
+component ProfileButton inherits Rectangle {
+    in property <string> text;
+    in property <bool> active;
+    in property <int> index;
+    in property <color> active-color; 
+ 
+    callback clicked(int);
+
+    height: 38px;
+    border-radius: 6px;
+
+    animate background { duration: 150ms; }
+
+    ta := TouchArea {
+        clicked => { root.clicked(root.index); }
+    }
+
+    background: root.active ? root.active-color : (ta.has-hover ? #45475a : #313244);
+
+    Text {
+        text: root.text;
+        color: root.active ? #1e1e2e : #cdd6f4;
+        font-size: 14px;
+        font-weight: root.active ? 800 : 500;
+    }
+}
+
+component FanGauge inherits Rectangle {
+    in property <int> rpm: 0;
+    in property <int> percentage: 0;
+
+    property <angle> fan-angle: 0deg;
+    property <color> active-color: root.percentage > 80 ? #f38ba8 : (root.percentage > 40 ? #f9e2af : #8caaee);
+
+    height: 50px; 
+
+    Timer {
+        interval: 16ms;
+        running: root.rpm > 0;
+        triggered => {
+            root.fan-angle += (root.percentage / 100.0) * 4deg; 
+        }
+    }
+
+    VerticalBox {
+        padding: 0px;
+        spacing: 8px;
+
+        HorizontalBox {
+            alignment: start;
+            spacing: 12px;
+
+            Image {
+                width: 24px;
+                height: 24px;
+                colorize: root.percentage > 0 ? root.active-color : #45475a;
+                transform-rotation: root.fan-angle;
+                source: @image-url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M10.827 16.379a6.082 6.082 0 0 1-8.618-7.002l5.412 1.45a6.082 6.082 0 0 1 7.002-8.618l-1.45 5.412a6.082 6.082 0 0 1 8.618 7.002l-5.412-1.45a6.082 6.082 0 0 1-7.002 8.618l1.45-5.412Z'/><path d='M12 12v.01'/></svg>");
+            }
+
+            VerticalBox {
+                alignment: center;
+                Text {
+                    text: "\{root.rpm} RPM";
+                    font-size: 14px;
+                    font-weight: 700;
+                    color: #cdd6f4;
+                }
+            }
+        }
+
+        Rectangle {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #313244; 
+
+            Rectangle {
+                x: 0;
+                width: parent.width * (root.percentage / 100.0);
+                height: 100%;
+                border-radius: 4px;
+                background: root.active-color;
+                animate width { duration: 250ms; easing: ease-in-out; }
+            }
+        }
+    }
+}
+
+component TempGauge inherits Rectangle {
+    in property <int> degrees: 0;
+
+    property <float> percentage: clamp(root.degrees, 0, 100) / 100.0;
+
+    property <color> active-color: root.degrees > 80 ? #f38ba8 : (root.degrees > 50 ? #f9e2af : #8caaee);
+
+    height: 50px;
+
+    VerticalBox {
+        padding: 0px;
+        spacing: 8px;
+
+        HorizontalBox {
+            alignment: start;
+            spacing: 12px;
+
+            Image {
+                width: 24px;
+                height: 24px;
+                colorize: root.active-color;
+                source: @image-url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z'/><path d='M11.5 6.5v6'/></svg>");
+            }
+
+            VerticalBox {
+                alignment: center;
+                Text {
+                    text: "\{root.degrees}°C";
+                    font-size: 14px;
+                    font-weight: 700;
+                    color: #cdd6f4;
+                }
+            }
+        }
+
+        Rectangle {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #313244; 
+
+            Rectangle {
+                x: 0;
+                width: parent.width * root.percentage;
+                height: 100%;
+                border-radius: 4px;
+                background: root.active-color;
+                animate width { duration: 250ms; easing: ease-in-out; }
+            }
+        }
+    }
+}
+
+export component AppWindow inherits Window {
+    title: "HP Thermals";
+    preferred-width: 256px;
+    preferred-height: 494px;
+    background: #1e1e2e;
+
+    in-out property <int> active-profile: 0;
+    in-out property <int> fan-rpm: 0;
+    in-out property <int> fan-percent: 0;
+    in-out property <int> cpu-temp: 0;
+
+    callback set-profile(int);
+
+    VerticalBox {
+        width: 250px;
+        padding: 16px;
+        spacing: 16px;
+
+
+        FanGauge {
+            rpm: root.fan-rpm;
+            percentage: root.fan-percent;
+        }
+
+        Rectangle { height: 12px; }
+
+        TempGauge {
+            degrees: root.cpu-temp;
+        }
+
+        Rectangle { height: 12px; }
+
+        VerticalBox {
+            alignment: end;
+            Text {
+                text: "Select profile:";
+                font-size: 13px;
+                font-weight: 700;
+                color: #a6adc8;
+                horizontal-alignment: start;
+            }
+
+            Rectangle { height: 4px; }
+
+            ProfileButton { text: "Balanced"; index: 0; active: active-profile == 0; active-color: #f9e2af; clicked(idx) => { active-profile = idx; set-profile(idx); } }
+            ProfileButton { text: "Performance"; index: 1; active: active-profile == 1; active-color: #f38ba8; clicked(idx) => { active-profile = idx; set-profile(idx); } }
+            ProfileButton { text: "Quiet"; index: 2; active: active-profile == 2; active-color: #cba6f7; clicked(idx) => { active-profile = idx; set-profile(idx); } }
+            ProfileButton { text: "Cool"; index: 3; active: active-profile == 3; active-color: #8caaee; clicked(idx) => { active-profile = idx; set-profile(idx); } }
+            ProfileButton { text: "Power Save"; index: 4; active: active-profile == 4; active-color: #a6e3a1; clicked(idx) => { active-profile = idx; set-profile(idx); } }
+        }
+    }
+}

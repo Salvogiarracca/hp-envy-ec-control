@@ -1,0 +1,12 @@
+[package]
+name = "hp_ec_gui"
+version = "0.1.0"
+edition = "2024"
+authors = ["Salvatore Giarracca"]
+
+[dependencies]
+slint = "1.5.1"
+libc = "0.2"
+
+[build-dependencies]
+slint-build = "1.5.1"

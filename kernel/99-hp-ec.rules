@@ -1,0 +1,1 @@
+KERNEL=="hp_ec_thermal", MODE="0666"

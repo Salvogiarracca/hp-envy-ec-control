@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=HP Thermals
+Comment=Thermal and Fan management for HP Envy x360 15-ew000xx
+Exec=/usr/local/bin/hp_ec_gui
+Icon=hp_ec_icon
+Terminal=false
+Type=Application
+Categories=System;Settings;HardwareSettings;
+StartupWMClass=hp_ec_gui
