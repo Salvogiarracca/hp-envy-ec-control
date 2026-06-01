@@ -3,6 +3,8 @@ name = "hp_ec_gui"
 version = "0.1.0"
 edition = "2024"
 authors = ["Salvatore Giarracca"]
+description = "Wayland GUI for HP Envy x360 Thermal Control"
+license = "GPL-3.0-or-later"
 
 [dependencies]
 slint = "1.5.1"

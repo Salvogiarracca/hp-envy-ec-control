@@ -68,7 +68,7 @@ if [ -f "./gui/utils/hp_ec_icon.svg" ] && [ -f "./gui/utils/hp_ec_gui.desktop" ]
     cp ./gui/utils/hp_ec_icon.svg /usr/share/icons/hicolor/scalable/apps/
 
     mkdir -p /usr/share/applications/
-    cp ./gui/utils/p_ec_gui.desktop /usr/share/applications/
+    cp ./gui/utils/hp_ec_gui.desktop /usr/share/applications/
 
     update-desktop-database /usr/share/applications/
     gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true

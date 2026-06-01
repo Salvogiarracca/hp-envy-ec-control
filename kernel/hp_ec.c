@@ -165,3 +165,4 @@ module_exit(hp_ec_exit);
 MODULE_AUTHOR("Salvatore Giarracca");
 MODULE_DESCRIPTION("HP Envy x360 15-ew0xxx EC Thermal Control");
 MODULE_LICENSE("GPL");
+MODULE_VERSION("1.0");
